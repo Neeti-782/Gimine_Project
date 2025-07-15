@@ -1,35 +1,43 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useAuthStore } from "./store/authStore";
+import { useChatroomStore } from "./store/chatroomStore";
 
-function App() {
-  const [count, setCount] = useState(0)
+import { useUIStore } from "./store/uiStore";
+import DarkModeToggle from "./Components/DarkModeToggle";
+import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+import PhoneLogin from "./Components/Auth/PhoneLogin";
+import Dashboard from "./Components/Auth/Dashboard/Dashboard";
+import ChatroomList from "./Components/Auth/Dashboard/ChatroomList";
+import Chatroom from "./Components/Chatroom/Chatroom";
+
+export default function App() {
+  const phone = useAuthStore((s) => s.phone);
+  const selectedId = useChatroomStore((s) => s.selectedId);
+  const darkMode = useUIStore((s) => s.darkMode);
+  const toggleDarkMode = useUIStore((s) => s.toggleDarkMode);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [darkMode]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+      <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <Toaster position="top-center" />
+      {!phone ? (
+        <PhoneLogin />
+      ) : selectedId ? (
+        <div className="w-full max-w-3xl p-6 rounded-2xl shadow-2xl bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 flex flex-col gap-6 transition-all duration-300">
+          <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4 drop-shadow-lg">Welcome to the Chatroom</h2>
+          <Chatroom />
+        </div>
+      ) : (
+        <Dashboard />
+      )}
+    </div>
+  );
 }
-
-export default App
