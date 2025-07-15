@@ -122,13 +122,9 @@ function Chatroom() {
     }
   };
 
-  // if (!chatroom) {
-  //   return <div className="text-center p-8">No chatroom selected.</div>;
-  // }
 
   return (
     <div className="relative flex flex-col h-[80vh] w-full max-w-2xl mx-auto rounded-3xl shadow-2xl overflow-hidden bg-white/60 dark:bg-gray-900/70 backdrop-blur-lg border border-gray-200 dark:border-gray-700">
-      {/* Background gradient */}
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-blue-200/40 via-purple-200/30 to-pink-200/20 dark:from-blue-900/40 dark:via-purple-900/30 dark:to-pink-900/20 pointer-events-none" />
       {/* Header */}
       <div className="relative z-10 flex items-center justify-between px-8 py-5 border-b bg-gradient-to-r from-blue-600/90 to-purple-600/90 text-white font-bold text-2xl shadow-md">
@@ -190,7 +186,6 @@ function Chatroom() {
                   {msg.sender === phone ? "You" : msg.sender}
                 </div>
               </div>
-              {/* Copy to clipboard button */}
               {copyMsgIdx === idx && msg.text && (
                 <button
                   className="absolute top-2 right-2 bg-white/80 dark:bg-gray-800/80 border border-gray-300 dark:border-gray-700 rounded px-2 py-1 text-xs text-gray-700 dark:text-gray-200 shadow hover:bg-blue-100 dark:hover:bg-blue-900 transition"
