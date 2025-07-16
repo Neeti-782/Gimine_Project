@@ -32,7 +32,7 @@ export default function App() {
   else if (selectedId) {
     mainContent = (
       <div className="flex flex-col items-center text-2xl justify-center w-full h-full gap-4">
-        <h1>Welcome to the Chatroom</h1>
+        <h1 className={`${!darkMode? 'text-[#4f46e5]' : 'text-[#c7d2fe]'}`}>Welcome to the Chatroom</h1>
         <Chatroom />
       </div>
     );
