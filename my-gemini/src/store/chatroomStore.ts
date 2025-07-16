@@ -1,16 +1,21 @@
+
+// Zustand state management
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+
+// Utilities
 import { v4 as uuidv4 } from "uuid";
 
 
-type Message = {
+// Types
+export type Message = {
   sender: string;
   text: string;
   image?: string | null;
   timestamp: string;
 };
 
-type Chatroom = {
+export type Chatroom = {
   id: string;
   name: string;
   messages: Message[];
@@ -23,13 +28,18 @@ type Store = {
   deleteChatroom: (id: string) => void;
   selectChatroom: (id: string | null) => void;
   addMessage: (chatroomId: string, message: Message) => void;
+  reset: () => void;
 };
 
+// Zustand store for chatrooms
 export const useChatroomStore = create<Store>()(
   persist(
     (set) => ({
+      // State
       chatrooms: [],
       selectedId: null,
+
+      // Add a new chatroom
       addChatroom: (name) =>
         set((state) => ({
           chatrooms: [
@@ -37,12 +47,18 @@ export const useChatroomStore = create<Store>()(
             { id: uuidv4(), name, messages: [] },
           ],
         })),
+
+      // Delete a chatroom and reset selection
       deleteChatroom: (id) =>
         set((state) => ({
           chatrooms: state.chatrooms.filter((r) => r.id !== id),
           selectedId: null,
         })),
+
+      // Select a chatroom by id
       selectChatroom: (id) => set({ selectedId: id }),
+
+      // Add a message to a chatroom
       addMessage: (chatroomId, message) =>
         set((state) => ({
           chatrooms: state.chatrooms.map((room) =>
@@ -51,6 +67,9 @@ export const useChatroomStore = create<Store>()(
               : room
           ),
         })),
+
+      // Reset all chatrooms and selection
+      reset: () => set({ chatrooms: [], selectedId: null }),
     }),
     {
       name: "chatroom-storage",

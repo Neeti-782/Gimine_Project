@@ -1,9 +1,23 @@
+
+// Notifications
 import toast from "react-hot-toast";
-import { useChatroomStore } from "../../../store/chatroomStore";
+
+// Store
+import { useChatroomStore } from "../../store/chatroomStore";
 
 export default function ChatroomList() {
+  // Store actions and state
   const { chatrooms, deleteChatroom, selectChatroom } = useChatroomStore();
 
+  // Handle delete chatroom
+  const handleDelete = (roomId: string, roomName: string) => {
+    if (confirm(`Delete "${roomName}"?`)) {
+      deleteChatroom(roomId);
+      toast.success(`Deleted "${roomName}"`);
+    }
+  };
+
+  // Render chatroom list
   return (
     <div className="mt-4 space-y-3">
       {chatrooms.length === 0 ? (
@@ -14,7 +28,9 @@ export default function ChatroomList() {
             key={room.id}
             className="flex justify-between items-center p-4 bg-white/90 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition group"
           >
+            {/* Chatroom name */}
             <span className="font-medium text-gray-900 group-hover:text-blue-700 transition truncate max-w-[60%]">{room.name}</span>
+            {/* Actions */}
             <div className="flex gap-2">
               <button
                 onClick={() => selectChatroom(room.id)}
@@ -23,12 +39,7 @@ export default function ChatroomList() {
                 Enter
               </button>
               <button
-                onClick={() => {
-                  if (confirm(`Delete \"${room.name}\"?`)) {
-                    deleteChatroom(room.id);
-                    toast.success(`Deleted \"${room.name}\"`);
-                  }
-                }}
+                onClick={() => handleDelete(room.id, room.name)}
                 className="px-3 py-1 text-sm font-semibold text-white bg-red-500 rounded-lg shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 transition"
               >
                 Delete

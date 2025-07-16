@@ -1,29 +1,48 @@
+
+// Form and validation
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+// React
 import { useState } from "react";
+
+// Store
 import { useAuthStore } from "../../store/authStore";
 
+
+// Validation schema
 const schema = z.object({
   otp: z.string().length(4, "Enter a 4-digit OTP"),
 });
 
 type FormValues = z.infer<typeof schema>;
 
-interface OTPVerificationProps {
+export interface OTPVerificationProps {
   phone: string;
   onBack: () => void;
 }
 
+
 export default function OTPVerification({ phone, onBack }: OTPVerificationProps) {
+  // State for verification status
   const [verified, setVerified] = useState(false);
+
+  // Store action
   const setPhone = useAuthStore((s) => s.setPhone);
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormValues>({
+
+  // Form setup
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({
     resolver: zodResolver(schema),
   });
 
+  // Handle OTP submit
   const onSubmit = (data: FormValues) => {
-    console.log("Verifying OTP:", data.otp);
+    // console.log("Verifying OTP:", data.otp);
     setTimeout(() => {
       setVerified(true);
       setPhone(phone);
@@ -32,11 +51,16 @@ export default function OTPVerification({ phone, onBack }: OTPVerificationProps)
 
   return (
     <div className="space-y-6 animate-fade-in">
+      {/* OTP form or success message */}
       {!verified ? (
         <>
+          {/* Header */}
           <div className="flex flex-col items-center gap-2 mb-2">
-            <span className="text-blue-600 text-lg font-semibold">Enter OTP sent to <span className="font-mono">{phone}****</span></span>
+            <span className="text-blue-600 text-lg font-semibold">
+              Enter OTP sent to <span className="font-mono">{phone}****</span>
+            </span>
           </div>
+          {/* OTP input form */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <input
               type="text"
@@ -63,7 +87,9 @@ export default function OTPVerification({ phone, onBack }: OTPVerificationProps)
           </form>
         </>
       ) : (
-        <div className="text-green-600 font-bold text-center text-lg animate-pulse">✅ Verified Successfully!</div>
+        <div className="text-green-600 font-bold text-center text-lg animate-pulse">
+           Verified Successfully!
+        </div>
       )}
     </div>
   );

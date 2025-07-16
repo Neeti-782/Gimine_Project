@@ -5,6 +5,7 @@ import { useAuthStore } from "../../store/authStore";
 import { FiSend, FiImage } from "react-icons/fi";
 import toast from "react-hot-toast";
 
+// Simulate Gemini AI response
 function getFakeAIResponse(userMsg) {
   if (/image|photo|pic/i.test(userMsg)) {
     return "Here's an image for you!";
@@ -13,20 +14,20 @@ function getFakeAIResponse(userMsg) {
 }
 
 // Dummy data for simulating older messages
+// Generate dummy messages for pagination demo
 function getDummyMessages(page, pageSize, phone) {
   const total = 100;
   const start = Math.max(0, total - (page + 1) * pageSize);
   const end = total - page * pageSize;
-  const arr = [];
-  for (let i = start; i < end; i++) {
-    arr.push({
+  return Array.from({ length: end - start }, (_, idx) => {
+    const i = start + idx;
+    return {
       sender: i % 2 === 0 ? phone : "Gemini AI",
       text: i % 2 === 0 ? `Old message #${i}` : `Gemini reply #${i}`,
       image: null,
       timestamp: new Date(Date.now() - (total - i) * 60000).toISOString(),
-    });
-  }
-  return arr;
+    };
+  });
 }
 
 function Chatroom() {
@@ -46,42 +47,39 @@ function Chatroom() {
   const chatroom = chatrooms.find((c) => c.id === selectedId);
 
   // Combine dummy older messages with real chatroom messages for demo
-  const allMessages = chatroom
-    ? [
-        ...getDummyMessages(page, pageSize, phone),
-        ...(chatroom.messages || []),
-      ]
-    : [];
+  const allMessages = React.useMemo(() => (
+    chatroom
+      ? [...getDummyMessages(page, pageSize, phone), ...(chatroom.messages || [])]
+      : []
+  ), [chatroom, page, pageSize, phone]);
 
   useEffect(() => {
     setPaginatedMessages(allMessages);
     setHasMore(page < 4); // simulate 5 pages max
-  }, [chatroom, page]);
+  }, [allMessages, page]);
 
   // Auto-scroll to bottom on new message (only if not loading older)
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [chatroom?.messages, paginatedMessages.length, isTyping]);
+  }, [paginatedMessages.length, isTyping]);
 
   // Infinite scroll: load older messages when scrolled to top
   const handleScroll = useCallback(() => {
-    if (!messagesContainerRef.current) return;
-    if (messagesContainerRef.current.scrollTop < 50 && hasMore) {
+    if (messagesContainerRef.current?.scrollTop < 50 && hasMore) {
       setPage((p) => p + 1);
     }
   }, [hasMore]);
 
   useEffect(() => {
     const ref = messagesContainerRef.current;
-    if (ref) {
-      ref.addEventListener("scroll", handleScroll);
-      return () => ref.removeEventListener("scroll", handleScroll);
-    }
+    if (!ref) return;
+    ref.addEventListener("scroll", handleScroll);
+    return () => ref.removeEventListener("scroll", handleScroll);
   }, [handleScroll]);
 
-  // Throttled Gemini response
+  // Send message and simulate Gemini AI response
   const handleSend = () => {
     if (!input && !image) return;
     addMessage(selectedId, {
@@ -101,12 +99,13 @@ function Chatroom() {
         timestamp: new Date().toISOString(),
       });
       setIsTyping(false);
-    }, 1200 + Math.random() * 1200); // random delay for realism
+    }, 1200 + Math.random() * 1200);
   };
 
+  // Handle image upload
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    if (file && file.type.startsWith("image/")) {
+    if (file?.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (ev) => setImage(ev.target.result);
       reader.readAsDataURL(file);
@@ -115,6 +114,7 @@ function Chatroom() {
     }
   };
 
+  // Copy message text to clipboard
   const handleCopy = (msg) => {
     if (msg.text) {
       navigator.clipboard.writeText(msg.text);
@@ -139,7 +139,7 @@ function Chatroom() {
           </button>
           <button
             className="bg-red-500/90 text-white px-4 py-1.5 rounded-lg hover:bg-red-600 text-base font-semibold shadow transition"
-            onClick={() => { logout(); selectChatroom(null); }}
+            onClick={() => { logout(); useChatroomStore.getState().reset(); selectChatroom(null); }}
             title="Logout"
           >
             Logout
@@ -218,7 +218,7 @@ function Chatroom() {
           <img src={image} alt="preview" className="w-12 h-12 rounded-xl object-cover border border-gray-300 dark:border-gray-700 shadow" />
         )}
         <input
-          className="flex-1 border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white/90 dark:bg-gray-800/80 text-base shadow"
+          className="flex-1 border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400 bg-blue-60 focus:bg-white text-gray-900 text-base shadow"
           placeholder="Type a message..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
