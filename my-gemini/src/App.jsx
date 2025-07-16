@@ -28,14 +28,16 @@ export default function App() {
   let mainContent;
   if (!phone) {
     mainContent = <PhoneLogin />;
-  } else if (selectedId) {
+  }
+  else if (selectedId) {
     mainContent = (
-      <div className="w-full max-w-3xl p-6 rounded-2xl shadow-2xl bg-white/80 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 flex flex-col gap-6 transition-all duration-300">
-        <h2 className="text-3xl font-bold text-center text-gray-800 dark:text-gray-100 mb-4 drop-shadow-lg">Welcome to the Chatroom</h2>
+      <div className="flex flex-col items-center text-2xl justify-center w-full h-full gap-4">
+        <h1>Welcome to the Chatroom</h1>
         <Chatroom />
       </div>
     );
-  } else {
+  }
+  else {
     mainContent = <Dashboard />;
   }
 

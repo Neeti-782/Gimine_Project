@@ -139,7 +139,15 @@ function Chatroom() {
           </button>
           <button
             className="bg-red-500/90 text-white px-4 py-1.5 rounded-lg hover:bg-red-600 text-base font-semibold shadow transition"
-            onClick={() => { logout(); useChatroomStore.getState().reset(); selectChatroom(null); }}
+            onClick={() => {
+              logout();
+              useChatroomStore.getState().reset();
+              // Clear persisted Zustand storage for chatrooms
+              if (window.localStorage) {
+                window.localStorage.removeItem("chatroom-storage");
+              }
+              selectChatroom(null);
+            }}
             title="Logout"
           >
             Logout
