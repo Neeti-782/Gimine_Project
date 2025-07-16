@@ -1,35 +1,53 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+// React & hooks
+import { useEffect } from "react";
 
-function App() {
-  const [count, setCount] = useState(0)
+// Store hooks
+import { useAuthStore } from "./store/authStore";
+import { useChatroomStore } from "./store/chatroomStore";
+import { useUIStore } from "./store/uiStore";
+
+// Components
+import DarkModeToggle from "./Components/DarkModeToggle";
+import { Toaster } from "react-hot-toast";
+import PhoneLogin from "./Components/Auth/PhoneLogin";
+import Dashboard from "./Components/Dashboard/Dashboard";
+import Chatroom from "./Components/Chatroom/Chatroom";
+
+export default function App() {
+  // Store state
+  const phone = useAuthStore((s) => s.phone);
+  const selectedId = useChatroomStore((s) => s.selectedId);
+  const { darkMode, toggleDarkMode } = useUIStore();
+
+  // Sync dark mode with document
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
+
+  // Render main content based on auth and chatroom state
+  let mainContent;
+  if (!phone) {
+    mainContent = <PhoneLogin />;
+  }
+  else if (selectedId) {
+    mainContent = (
+      <div className="flex flex-col items-center text-2xl justify-center w-full h-full gap-4">
+        <h1 className={`${!darkMode? 'text-[#4f46e5]' : 'text-[#c7d2fe]'}`}>Welcome to the Chatroom</h1>
+        <Chatroom />
+      </div>
+    );
+  }
+  else {
+    mainContent = <Dashboard />;
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex items-center justify-center">
+      {/* Dark mode toggle and notifications */}
+      <DarkModeToggle darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+      <Toaster position="top-center" />
+      {/* Main content */}
+      {mainContent}
+    </div>
+  );
 }
-
-export default App
